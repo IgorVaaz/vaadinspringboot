@@ -1,6 +1,7 @@
 package com.example.application.views.list;
 
 import com.example.application.data.entity.Contact;
+import com.example.application.data.service.CrmService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -11,22 +12,23 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import java.util.Collections;
 @Route(value = "")
 @PageTitle("Contacts | Vaadin CRM")
 public class ListView extends VerticalLayout {
     Grid<Contact> grid = new Grid<>(Contact.class);
     TextField filterText = new TextField();
     ContactForm form;
+    CrmService service;
 
-    Contact contact = new Contact();
-
-    public ListView() {
+    public ListView(CrmService service) {
+        this.service = service;
         addClassName("list-view");
         setSizeFull();
         configureGrid();
         configureForm();
+
         add(getToolbar(), getContent());
+        updateList();
     }
 
     private Component getContent() {
@@ -35,12 +37,11 @@ public class ListView extends VerticalLayout {
         content.setFlexGrow(1, form);
         content.addClassNames("content");
         content.setSizeFull();
-        content.add(grid, form);
         return content;
     }
 
     private void configureForm() {
-        form = new ContactForm(Collections.emptyList(), Collections.emptyList());
+        form = new ContactForm(service.findAllCompanies(), service.findAllStatuses());
         form.setWidth("25em");
     }
 
@@ -57,6 +58,7 @@ public class ListView extends VerticalLayout {
         filterText.setPlaceholder("Filter by name...");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
+        filterText.addValueChangeListener(e -> updateList());
 
         Button addContactButton = new Button("Add contact");
 
@@ -65,6 +67,7 @@ public class ListView extends VerticalLayout {
         return toolbar;
     }
 
-
-    // Remaining methods omitted
+    private void updateList() {
+        grid.setItems(service.findAllContacts(filterText.getValue()));
+    }
 }

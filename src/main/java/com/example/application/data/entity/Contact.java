@@ -17,6 +17,10 @@ public class Contact extends AbstractEntity {
     @NotEmpty
     private String lastName = "";
 
+    @Email
+    @NotEmpty
+    private String email = "";
+
     @ManyToOne
     @JoinColumn(name = "company_id")
     @NotNull
@@ -27,9 +31,9 @@ public class Contact extends AbstractEntity {
     @ManyToOne
     private Status status;
 
-    @Email
-    @NotEmpty
-    private String email = "";
+//    @Email
+//    @NotEmpty
+//    private String email = "";
 
     @Override
     public String toString() {
