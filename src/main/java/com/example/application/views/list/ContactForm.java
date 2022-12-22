@@ -66,7 +66,14 @@ public class ContactForm extends FormLayout {
         binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
         return new HorizontalLayout(save, delete, close);
     }
-
+    private void validateAndSave() {
+        try {
+            binder.writeBean(contact);
+            fireEvent(new SaveEvent(this, contact));
+        } catch (ValidationException e) {
+            throw new RuntimeException(e);
+        }
+    }
     public void setContact(Contact contact) {
         this.contact = contact;
         binder.readBean(contact);
@@ -107,14 +114,6 @@ public class ContactForm extends FormLayout {
     public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType,
                                                                   ComponentEventListener<T> listener) {
         return getEventBus().addListener(eventType, listener);
-    }
-    private void validateAndSave() {
-        try {
-            binder.writeBean(contact);
-            fireEvent(new SaveEvent(this, contact));
-        } catch (ValidationException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
 
